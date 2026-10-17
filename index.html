@@ -1,63 +1,57 @@
 
 
+
 const API = "https://client.falixnodes.net/api/v2";
 
 export default {
   async fetch(request, env) {
     const cors = {
       "Access-Control-Allow-Origin": "https://sangeeta9650.github.io",
-      "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+      "Access-Control-Allow-Methods": "GET, OPTIONS",
       "Access-Control-Allow-Headers": "Content-Type",
       "Content-Type": "application/json"
     };
 
+    const json = (data, status = 200) =>
+      new Response(JSON.stringify(data), { status, headers: cors });
+
     if (request.method === "OPTIONS") {
-      return new Response(null, { headers: cors });
+      return new Response(null, { status: 204, headers: cors });
     }
 
-    const url = new URL(request.url);
-    const path = url.pathname;
+    if (request.method !== "GET") {
+      return json({ error: "Method not allowed" }, 405);
+    }
 
-    // Only allow documented, read-only routes here.
-    let target;
+    const routes = {
+      "/api/me": "/me",
+      "/api/servers": "/servers"
+    };
 
-    if (path === "/api/me" && request.method === "GET") {
-      target = "/me";
-    } else if (path === "/api/servers" && request.method === "GET") {
-      target = "/servers";
-    } else {
-      return Response.json(
-        { error: "Route not enabled yet. No action was sent to Falix." },
-        { status: 404, headers: cors }
-      );
+    const target = routes[new URL(request.url).pathname];
+
+    if (!target) {
+      return json({ error: "Route not found" }, 404);
     }
 
     if (!env.FALIX_API_KEY) {
-      return Response.json(
-        { error: "FALIX_API_KEY secret is missing in Worker settings." },
-        { status: 500, headers: cors }
-      );
+      return json({ error: "FALIX_API_KEY secret missing" }, 500);
     }
 
     try {
-      const response = await fetch(API + target, {
+      const res = await fetch(API + target, {
         headers: {
           Authorization: `Bearer ${env.FALIX_API_KEY}`,
           Accept: "application/json"
         }
       });
 
-      const body = await response.text();
-      return new Response(body, {
-        status: response.status,
+      return new Response(await res.text(), {
+        status: res.status,
         headers: cors
       });
     } catch {
-      return Response.json(
-        { error: "Could not reach Falix API." },
-        { status: 502, headers: cors }
-      );
+      return json({ error: "Falix API connection failed" }, 502);
     }
   }
 };
-
