@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -5,94 +6,123 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>CRAFTHOST</title>
 <style>
-body{background:#101827;color:white;font-family:Arial;text-align:center;padding:25px}
-.card{background:#1c293b;padding:24px;border-radius:15px;max-width:350px;margin:35px auto}
-input,button{box-sizing:border-box;width:100%;padding:13px;margin:8px 0;border:0;border-radius:7px}
-button{background:#4ade80;font-weight:bold}
+*{box-sizing:border-box}
+body{margin:0;background:#101827;color:white;font-family:Arial,sans-serif}
+header{padding:20px;background:#1c293b;color:#4ade80;font-size:25px;font-weight:bold}
+main{max-width:420px;margin:35px auto;padding:20px;text-align:center}
 p{color:#cbd5e1}
+.card{background:#1c293b;padding:22px;border-radius:14px;margin-top:22px}
+input,select,button{width:100%;padding:13px;margin:8px 0;border:0;border-radius:7px}
+button{background:#4ade80;color:#101827;font-weight:bold;cursor:pointer}
+.alt{background:#334155;color:white}
+#dashboard{display:none}
+.small{font-size:13px}
 </style>
 </head>
 <body>
-<h1>⛏ CRAFTHOST</h1>
-<p>Your World. Your Server.</p>
-<div class="card">
-<h2 id="heading">Create Account</h2>
-<form id="authForm">
-<input id="email" type="email" placeholder="Email" required>
-<input id="password" type="password" placeholder="Password (6+ characters)" minlength="6" required>
-<button id="submitBtn">Sign Up</button>
-</form>
-<p id="message"></p>
-<button id="switchBtn" type="button">Already have an account? Login</button>
-<button id="logoutBtn" hidden>Logout</button>
-</div>
+<header>⛏ CRAFTHOST</header>
+<main>
+  <h1>Your World. Your Server.</h1>
+  <p>Simple Minecraft hosting dashboard.</p>
+
+  <div class="card" id="auth">
+    <h2 id="heading">Login</h2>
+    <form id="authForm">
+      <input id="email" type="email" placeholder="Email" required>
+      <input id="password" type="password"
+       placeholder="Password (6+ characters)" minlength="6" required>
+      <button id="submitBtn">Login</button>
+    </form>
+    <button class="alt" id="switchBtn" type="button">
+      Create Account
+    </button>
+    <p id="message" class="small"></p>
+  </div>
+
+  <div class="card" id="dashboard">
+    <h2>My Dashboard</h2>
+    <p id="userEmail"></p>
+    <h3>Create a Server</h3>
+    <input id="serverName" placeholder="Server Name">
+    <select id="edition">
+      <option value="Java">Java Edition</option>
+      <option value="Bedrock">Bedrock Edition</option>
+    </select>
+    <button id="createBtn">Create Server</button>
+    <p id="serverMessage" class="small"></p>
+    <button class="alt" id="logoutBtn">Logout</button>
+  </div>
+</main>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-const client = window.supabase.createClient(
+const db = window.supabase.createClient(
   "https://tleiklvlzxgkqbdjnfns.supabase.co",
   "sb_publishable_zY9mHkixUxIUiE3H9BLfdg_m3acBAek"
 );
 
-let loginMode = false;
-const form = document.getElementById("authForm");
+let signup = false;
 const msg = document.getElementById("message");
 
 document.getElementById("switchBtn").onclick = () => {
-  loginMode = !loginMode;
+  signup = !signup;
   document.getElementById("heading").textContent =
-    loginMode ? "Login" : "Create Account";
+    signup ? "Create Account" : "Login";
   document.getElementById("submitBtn").textContent =
-    loginMode ? "Login" : "Sign Up";
+    signup ? "Sign Up" : "Login";
   document.getElementById("switchBtn").textContent =
-    loginMode ? "Create a new account" : "Already have an account? Login";
+    signup ? "Back to Login" : "Create Account";
   msg.textContent = "";
 };
 
-form.onsubmit = async (e) => {
+document.getElementById("authForm").onsubmit = async e => {
   e.preventDefault();
   msg.textContent = "Please wait...";
+
   const email = document.getElementById("email").value;
   const password = document.getElementById("password").value;
 
-  const result = loginMode
-    ? await client.auth.signInWithPassword({email, password})
-    : await client.auth.signUp({
+  const result = signup
+    ? await db.auth.signUp({
         email, password,
         options: {
-          emailRedirectTo: "https://sangeeta9650.github.io/Crafthost/"
+          emailRedirectTo:
+            "https://sangeeta9650.github.io/Crafthost/"
         }
-      });
+      })
+    : await db.auth.signInWithPassword({email, password});
 
   if (result.error) {
     msg.textContent = result.error.message;
-  } else if (loginMode) {
-    msg.textContent = "Login successful!";
-    showUser();
+  } else if (signup && !result.data.session) {
+    msg.textContent = "Check your email to confirm your account.";
   } else {
-    msg.textContent = result.data.session
-      ? "Account created! You are logged in."
-      : "Account created! Check your email to confirm.";
+    msg.textContent = "Success!";
+    showDashboard();
   }
 };
 
-async function showUser() {
-  const {data} = await client.auth.getUser();
-  if (data.user) {
-    document.getElementById("heading").textContent = "Welcome!";
-    msg.textContent = data.user.email;
-    form.hidden = true;
-    document.getElementById("switchBtn").hidden = true;
-    document.getElementById("logoutBtn").hidden = false;
-  }
+async function showDashboard() {
+  const {data} = await db.auth.getUser();
+  if (!data.user) return;
+
+  document.getElementById("auth").style.display = "none";
+  document.getElementById("dashboard").style.display = "block";
+  document.getElementById("userEmail").textContent = data.user.email;
 }
 
 document.getElementById("logoutBtn").onclick = async () => {
-  await client.auth.signOut();
+  await db.auth.signOut();
   location.reload();
 };
 
-client.auth.getSession().then(({data}) => {
-  if (data.session) showUser();
+document.getElementById("createBtn").onclick = () => {
+  document.getElementById("serverMessage").textContent =
+    "Server hosting is not connected yet.";
+};
+
+db.auth.getSession().then(({data}) => {
+  if (data.session) showDashboard();
 });
 </script>
 </body>
