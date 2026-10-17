@@ -1,56 +1,110 @@
 
+<
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>CraftHost | Minecraft Hosting</title>
-  <style>
-    body {
-      margin: 0;
-      background: #101827;
-      color: white;
-      font-family: Arial, sans-serif;
-      text-align: center;
-    }
-    header {
-      background: #1c293b;
-      padding: 22px;
-      color: #4ade80;
-      font-size: 28px;
-      font-weight: bold;
-    }
-    main { padding: 50px 18px; }
-    h1 { font-size: 40px; }
-    p { color: #cbd5e1; line-height: 1.7; }
-    button {
-      background: #4ade80;
-      border: none;
-      padding: 14px 22px;
-      border-radius: 8px;
-      font-weight: bold;
-    }
-    .card {
-      background: #1c293b;
-      padding: 20px;
-      margin: 30px auto;
-      max-width: 350px;
-      border-radius: 14px;
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CRAFTHOST | Minecraft Hosting</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#080d18;color:#f1f5f9;font-family:Arial,sans-serif}
+header{padding:18px 5%;display:flex;justify-content:space-between;align-items:center;background:#0c1321;border-bottom:1px solid #26344b}
+.logo{font-size:23px;font-weight:bold;color:#4ade80}
+nav{display:flex;gap:9px}
+button{cursor:pointer;border:0;border-radius:8px;padding:12px 16px;font-weight:bold}
+.primary{background:#4ade80;color:#07120b}
+.secondary{background:#1c2a40;color:white;border:1px solid #34435a}
+main{max-width:1050px;margin:auto;padding:45px 20px}
+.hero{text-align:center;padding:35px 0 60px}
+.tag{display:inline-block;padding:9px 14px;border:1px solid #24533b;border-radius:30px;color:#4ade80;font-size:13px}
+h1{font-size:clamp(38px,8vw,66px);line-height:1.1;margin:25px 0}
+h1 span{color:#4ade80}
+p{color:#9eacc1;line-height:1.7}
+.hero p{max-width:560px;margin:0 auto 25px}
+.actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.features{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:18px;margin-top:28px}
+.card{background:#111b2d;border:1px solid #26344b;border-radius:14px;padding:22px}
+.icon{font-size:28px}
+section{margin-top:45px}
+.panel{text-align:center;padding:30px}
+footer{text-align:center;padding:28px;border-top:1px solid #26344b;color:#9eacc1}
+.modal{display:none;position:fixed;inset:0;background:#000b;align-items:center;justify-content:center;padding:18px;z-index:5}
+.modal.show{display:flex}
+.dialog{width:100%;max-width:380px;background:#111b2d;border:1px solid #34435a;border-radius:15px;padding:24px}
+.dialog input{display:block;width:100%;padding:13px;margin:12px 0;background:#091221;color:white;border:1px solid #34435a;border-radius:8px}
+.dialog button{width:100%;margin-top:10px}
+.close{float:right;width:auto!important;background:transparent;color:white}
+.small{font-size:12px}
+a{color:#4ade80}
+@media(max-width:480px){header{padding:15px 12px}.logo{font-size:19px}nav{gap:6px}nav button{padding:10px;font-size:12px}main{padding:30px 15px}}
+</style>
 </head>
 <body>
-  <header>⛏ CraftHost</header>
-  <main>
-    <h1>Your World.<br>Your Server.</h1>
-    <p>Create your Minecraft server and play with friends.</p>
-    <button onclick="alert('Login coming soon!')">
-      Get Started
-    </button>
-    <div class="card">
-      <h2>🎮 Free Minecraft Hosting</h2>
-      <p>Your own server dashboard is coming soon.</p>
+<header>
+  <div class="logo">⛏ CRAFTHOST</div>
+  <nav>
+    <button class="secondary" onclick="openForm('login')">Login</button>
+    <button class="primary" onclick="openForm('signup')">Sign Up</button>
+  </nav>
+</header>
+
+<main>
+  <div class="hero">
+    <div class="tag">🎮 YOUR ADVENTURE STARTS HERE</div>
+    <h1>Your World.<br><span>Your Server.</span></h1>
+    <p>Create your Minecraft world, play with friends and prepare for your next adventure with CRAFTHOST.</p>
+    <div class="actions">
+      <button class="primary" onclick="openForm('signup')">Get Started →</button>
+      <button class="secondary" onclick="document.getElementById('features').scrollIntoView({behavior:'smooth'})">Explore Features</button>
     </div>
-  </main>
+  </div>
+
+  <section id="features">
+    <h2 style="text-align:center">Built for Minecraft Players</h2>
+    <p style="text-align:center">Everything you need to begin your server journey.</p>
+    <div class="features">
+      <div class="card"><div class="icon">⚡</div><h3>Simple Setup</h3><p>A clean, easy-to-use hosting dashboard design.</p></div>
+      <div class="card"><div class="icon">🌍</div><h3>Java & Bedrock</h3><p>Plan your server for Java or Bedrock players.</p></div>
+      <div class="card"><div class="icon">🛡️</div><h3>Server Control</h3><p>Server status, console and file tools are planned.</p></div>
+    </div>
+  </section>
+
+  <section class="card panel">
+    <div class="icon">🧱</div>
+    <h2>Your Server Dashboard</h2>
+    <p>Create an account to begin your CRAFTHOST journey. Actual server creation and controls will need a supported hosting API and secure backend.</p>
+    <button class="primary" onclick="openForm('signup')">Create Your Account</button>
+  </section>
+</main>
+
+<footer>© 2026 CRAFTHOST · Made for Minecraft players 🎮</footer>
+
+<div class="modal" id="modal" onclick="if(event.target===this)closeForm()">
+  <div class="dialog">
+    <button class="close" onclick="closeForm()">✕</button>
+    <h2 id="heading">Welcome</h2>
+    <p id="description">Continue your adventure.</p>
+    <form onsubmit="event.preventDefault();alert('Demo only! Real signup/login will be connected after backend setup.');">
+      <input type="email" placeholder="Email address" required>
+      <input type="password" placeholder="Password (demo only)" minlength="8" required>
+      <button class="primary" id="submitButton" type="submit">Continue</button>
+    </form>
+    <p class="small">Demo form only. Do not enter your real password.</p>
+    <p id="switchText">Already registered? <a href="#" onclick="openForm('login');return false">Login</a></p>
+  </div>
+</div>
+
+<script>
+function openForm(type){
+  const signup=type==='signup';
+  document.getElementById('heading').textContent=signup?'Create your account':'Welcome back';
+  document.getElementById('description').textContent=signup?'Join CRAFTHOST and prepare your world.':'Login design preview for CRAFTHOST.';
+  document.getElementById('submitButton').textContent=signup?'Sign Up':'Login';
+  document.getElementById('switchText').innerHTML=signup?'Already registered? <a href="#" onclick="openForm(\'login\');return false">Login</a>':'New to CRAFTHOST? <a href="#" onclick="openForm(\'signup\');return false">Sign Up</a>';
+  document.getElementById('modal').classList.add('show');
+}
+function closeForm(){document.getElementById('modal').classList.remove('show')}
+</script>
 </body>
 </html>
