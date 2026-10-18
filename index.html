@@ -7,89 +7,85 @@
 <title>CRAFTHOST</title>
 <style>
 *{box-sizing:border-box}
-body{margin:0;background:#070914;color:#f7f7ff;font-family:Arial,sans-serif;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
-.card{width:100%;max-width:430px;background:#111426;border:1px solid #292e4a;border-radius:22px;padding:25px}
-.logo{font-size:27px;font-weight:800;margin-bottom:10px}
-.logo span{color:#a783ff}
-.tagline{color:#a7adc5;font-size:14px;margin-bottom:35px}
-h2{font-size:24px;margin-bottom:25px}
-label{display:block;margin:18px 0 9px;color:#c8cce0;font-size:14px}
-input{width:100%;padding:15px;border-radius:11px;border:1px solid #363d5d;background:#080b18;color:white;font-size:16px}
-.address{display:flex;align-items:center;border:1px solid #363d5d;background:#080b18;border-radius:11px;padding-right:14px}
-.address input{border:0;min-width:0}
-.address span{color:#b8a1ff;font-weight:bold}
-button{width:100%;padding:16px;margin-top:25px;border:0;border-radius:12px;background:linear-gradient(100deg,#773cff,#167dff);color:white;font-size:17px;font-weight:bold}
-button:disabled{opacity:.6}
-#message{margin-top:18px;line-height:1.5;overflow-wrap:anywhere;font-size:14px}
-.note{color:#9098b4;font-size:12px;line-height:1.5;margin-top:25px}
+body{margin:0;background:#090b12;color:#fff;font-family:Arial,sans-serif;display:grid;place-items:center;min-height:100vh;padding:20px}
+.card{width:100%;max-width:420px;background:#151925;border:1px solid #30394d;border-radius:18px;padding:25px}
+h1{color:#a78bfa;text-align:center;margin-top:0}
+p{text-align:center;color:#aeb7ca}
+label{display:block;margin:18px 0 8px}
+input{width:100%;padding:14px;border-radius:9px;border:1px solid #414b60;background:#090d17;color:white;font-size:16px}
+.address{display:flex;align-items:center;gap:7px}
+.address span{color:#a78bfa;font-weight:bold}
+button{width:100%;margin-top:22px;padding:14px;border:0;border-radius:9px;background:#8b5cf6;color:white;font-size:16px;font-weight:bold}
+#status{overflow-wrap:anywhere;font-size:14px}
 </style>
 </head>
 <body>
-<div class="card">
-  <div class="logo">◇ CRAFT<span>HOST</span></div>
-  <div class="tagline">Your server. Your world.</div>
-  <h2>Create Your Server</h2>
+<main class="card">
+<h1>CRAFTHOST</h1>
+<p>Create your Minecraft server</p>
 
-  <form id="form">
-    <label for="name">Server Name</label>
-    <input id="name" value="BURGER SMP" required minlength="3" maxlength="20">
+<label for="serverName">Server Name</label>
+<input id="serverName" value="BURGER SMP" maxlength="30">
 
-    <label for="subdomain">Server Address</label>
-    <div class="address">
-      <input id="subdomain" value="burgersmp" required
-       pattern="[a-z0-9]+(-[a-z0-9]+)*" maxlength="30">
-      <span>.net</span>
-    </div>
-
-    <button id="create" type="submit">＋ Create Server</button>
-  </form>
-
-  <div id="message" role="status"></div>
-  <div class="note">Your server, your world. Server address availability depends on domain ownership and hosting support.</div>
+<label for="address">Server Address</label>
+<div class="address">
+<input id="address" value="burgersmp" maxlength="30">
+<span>.net</span>
 </div>
 
+<button id="create">Create Server</button>
+<p id="status" role="status"></p>
+</main>
+
 <script>
-const API="https://crafthost.sangeetakumari56866.workers.dev";
-const form=document.getElementById("form");
-const button=document.getElementById("create");
-const message=document.getElementById("message");
+const API = "https://crafthost.sangeetakumari56866.workers.dev";
+const button = document.getElementById("create");
+const statusBox = document.getElementById("status");
 
-form.addEventListener("submit",async e=>{
-  e.preventDefault();
+button.addEventListener("click", async () => {
+  const name = document.getElementById("serverName").value.trim();
+  const subdomain = document.getElementById("address").value.trim().toLowerCase();
 
-  // Access code is requested privately when needed; never hardcode it.
-  const accessCode=prompt("Enter your CRAFTHOST access code:");
-  if(!accessCode)return;
+  if (!name || !/^[a-z0-9-]{3,30}$/.test(subdomain)) {
+    statusBox.textContent = "Enter a server name and an address using 3–30 letters, numbers or hyphens.";
+    return;
+  }
 
-  button.disabled=true;
-  message.textContent="Connecting to CRAFTHOST…";
+  let code = sessionStorage.getItem("crafthost_code");
+  if (!code) {
+    code = prompt("Enter your CRAFTHOST access code:");
+    if (!code) return;
+    sessionStorage.setItem("crafthost_code", code);
+  }
 
-  try{
-    const response=await fetch(API+"/api/servers",{
-      method:"POST",
-      headers:{
-        "Content-Type":"application/json",
-        "X-CRAFTHOST-ACCESS-CODE":accessCode
+  button.disabled = true;
+  button.textContent = "Creating...";
+  statusBox.textContent = "Connecting to server host...";
+
+  try {
+    const response = await fetch(API + "/api/servers", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CRAFTHOST-ACCESS-CODE": code
       },
-      body:JSON.stringify({
-        name:document.getElementById("name").value.trim(),
-        subdomain:document.getElementById("subdomain").value.trim()
-      })
+      body: JSON.stringify({ name, subdomain })
     });
 
-    const data=await response.json();
-    if(!response.ok){
-      const err=data.error||data;
-      message.textContent="Unable to create server: "+
-        (err.message||err.code||JSON.stringify(err));
-      return;
+    const data = await response.json();
+    if (!response.ok) {
+      if (response.status === 401 || response.status === 403) {
+        sessionStorage.removeItem("crafthost_code");
+      }
+      throw new Error(data.message || data.error || "Request failed (" + response.status + ")");
     }
 
-    message.textContent="Request sent to hosting provider: "+JSON.stringify(data);
-  }catch(err){
-    message.textContent="Connection failed. Cloudflare Worker ko check karo.";
-  }finally{
-    button.disabled=false;
+    statusBox.textContent = JSON.stringify(data);
+  } catch (error) {
+    statusBox.textContent = "Error: " + error.message;
+  } finally {
+    button.disabled = false;
+    button.textContent = "Create Server";
   }
 });
 </script>
