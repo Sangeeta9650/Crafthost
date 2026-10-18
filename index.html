@@ -1,284 +1,144 @@
 
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
+<meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>CRAFTHOST — Minecraft Server Hosting</title>
+<title>CRAFTHOST</title>
 <style>
-:root{color-scheme:dark;--bg:#050a18;--panel:#0a1328;--line:#1b3155;--text:#f4f7ff;--muted:#9eb5dd;--purple:#7c3cff;--cyan:#00d9ff;--green:#00d6a0}
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--text);font:15px Arial,sans-serif}
-button,input,select{font:inherit}
-button{cursor:pointer}
-header{height:76px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 5%;position:sticky;top:0;background:#050a18f5;z-index:3}
-.logo{font-size:27px;font-weight:900;letter-spacing:.5px}.logo span{color:#a16aff}
-nav{display:flex;gap:12px;align-items:center}nav a{color:var(--muted);text-decoration:none;padding:12px}
-.btn{border:0;border-radius:10px;padding:12px 17px;color:white;background:linear-gradient(100deg,var(--purple),#087bff);font-weight:bold}
-.btn.outline{background:transparent;border:1px solid #46659c}
-.btn.green{background:#007c6b}.btn.red{background:#662c45}
-.layout{display:grid;grid-template-columns:205px 1fr;min-height:calc(100vh - 76px)}
-aside{border-right:1px solid var(--line);padding:24px 14px}
-.side{display:block;color:#bfd1f4;padding:14px 12px;border-radius:10px;text-decoration:none;margin-bottom:7px}
-.side.active,.side:hover{background:#28155b;color:white}
-main{padding:25px;max-width:1500px;width:100%;margin:auto}
-.hero{padding:35px;border:1px solid var(--line);border-radius:18px;background:radial-gradient(ellipse at 85% 20%,#342080 0,transparent 42%),linear-gradient(120deg,#101b39,#080f22);min-height:230px}
-.kicker{color:#9ebaff;letter-spacing:2px;font-size:12px;font-weight:bold}
-h1{font-size:clamp(30px,4vw,48px);margin:16px 0 10px}h1 span{color:#9c6cff}
-p{color:var(--muted);line-height:1.6}
-.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin:22px 0}
-.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:20px}
-.stat strong{display:block;font-size:27px;margin:8px 0}
-.section-head{display:flex;justify-content:space-between;align-items:center;gap:12px}
-.servers{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
-.server{border:1px solid #24436c;border-radius:14px;padding:17px;background:#081226}
-.server h3{margin:0 0 10px}.tag{font-size:12px;color:var(--green);background:#07372f;padding:6px 10px;border-radius:20px}
-.server p{margin:8px 0;overflow-wrap:anywhere}
-.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:15px}
-.actions button{flex:1}
-form{display:grid;gap:14px}
-label{display:grid;gap:7px;color:#b9cbee}
-input,select{width:100%;padding:12px;border-radius:9px;border:1px solid #2b4269;background:#060d1e;color:white}
-#creator{margin-top:24px;scroll-margin-top:90px}
-#message{white-space:pre-wrap;overflow-wrap:anywhere;color:#9deaff}
-.hidden{display:none!important}
-footer{padding:22px;color:#7f96bf;text-align:center}
-@media(max-width:760px){header{padding:0 16px;height:65px}.logo{font-size:21px}nav a:not(.login){display:none}.layout{display:block}aside{display:flex;overflow:auto;padding:8px;border:0;border-bottom:1px solid var(--line)}.side{white-space:nowrap;margin:0;padding:12px}main{padding:14px}.hero{padding:23px 18px;min-height:0}.stats{grid-template-columns:1fr}.servers{grid-template-columns:1fr}.card{padding:16px}}
+body{margin:0;min-height:100vh;background:#090a12;color:#f7f7ff;
+font-family:Arial,sans-serif;display:grid;place-items:center;padding:20px}
+main{width:100%;max-width:430px;background:#121421;border:1px solid #292d43;
+border-radius:22px;padding:25px;box-shadow:0 20px 70px #0008}
+.brand{font-size:25px;font-weight:800;letter-spacing:1px}
+.brand span{color:#9b7bff}
+.sub{color:#9da3b8;margin:8px 0 28px;font-size:14px}
+h2{font-size:21px;margin:0 0 22px}
+label{display:block;color:#c7cbe0;font-size:13px;margin:16px 0 8px}
+input{width:100%;background:#090b14;color:white;border:1px solid #343951;
+border-radius:11px;padding:14px;font-size:16px;outline:none}
+input:focus{border-color:#9b7bff}
+.address{display:flex;align-items:center;background:#090b14;
+border:1px solid #343951;border-radius:11px;padding-right:13px}
+.address input{border:0;min-width:0}
+.address b{color:#b6a3ff;white-space:nowrap}
+button{width:100%;margin-top:23px;border:0;border-radius:11px;
+padding:15px;background:linear-gradient(100deg,#7357f5,#a34dff);
+color:white;font-size:16px;font-weight:700}
+button:disabled{opacity:.55}
+#message{font-size:14px;line-height:1.5;overflow-wrap:anywhere;margin-top:17px}
+.muted{color:#939ab0;font-size:12px;line-height:1.5;margin-top:22px}
 </style>
 </head>
 <body>
-<header>
-  <div class="logo">◇ CRAFT<span>HOST</span></div>
-  <nav>
-    <a href="#dashboard">Dashboard</a>
-    <a href="#creator">＋ Create Server</a>
-    <a href="#docs">Docs</a>
-    <button class="btn outline login" onclick="showLogin()">Login</button>
-  </nav>
-</header>
+<main>
+  <div class="brand">◇ CRAFT<span>HOST</span></div>
+  <p class="sub">Your server. Your world.</p>
+  <h2>Create your Minecraft server</h2>
 
-<div class="layout">
-<aside>
-  <a class="side active" href="#dashboard">⌂ Dashboard</a>
-  <a class="side" href="#myservers">▣ My Servers</a>
-  <a class="side" href="#creator">＋ Create Server</a>
-  <a class="side" href="#settings">⚙ Settings</a>
-</aside>
+  <form id="createForm">
+    <label for="serverName">Server name</label>
+    <input id="serverName" value="BURGER SMP" minlength="3"
+      maxlength="20" required>
 
-<main id="dashboard">
-  <section class="hero">
-    <div class="kicker">WELCOME TO CRAFTHOST</div>
-    <h1>Your server. <span>Your world.</span></h1>
-    <p>Create and manage your Minecraft servers in one place.</p>
-    <button class="btn" onclick="document.querySelector('#creator').scrollIntoView({behavior:'smooth'})">＋ Create Server</button>
-  </section>
+    <label for="address">Server address</label>
+    <div class="address">
+      <input id="address" value="burgersmp" maxlength="20"
+        pattern="[a-z0-9]+(-[a-z0-9]+)*" required>
+      <b>.net</b>
+    </div>
 
-  <section class="stats">
-    <div class="card stat">▣ Servers<strong id="serverCount">—</strong><p>Total servers on your account</p></div>
-    <div class="card stat">♟ Players<strong>—</strong><p>Player count depends on server status</p></div>
-    <div class="card stat">⬡ Hosting<strong>Falix</strong><p>Connected hosting provider</p></div>
-  </section>
+    <label for="accessCode">Your CRAFTHOST access code</label>
+    <input id="accessCode" type="password" autocomplete="off"
+      placeholder="Enter your access code" required>
 
-  <section class="card" id="myservers">
-    <div class="section-head"><h2>Your Servers</h2><button class="btn outline" onclick="loadServers()">↻ Refresh</button></div>
-    <p id="serverMessage">Connect your access code to load your servers.</p>
-    <div id="serverList" class="servers"></div>
-  </section>
+    <button id="createButton" type="submit">Create Server</button>
+  </form>
 
-  <section class="card" id="creator">
-    <h2>＋ Create a Server</h2>
-    <p>Enter your CRAFTHOST access code and server details. Falix may require additional approval.</p>
-    <form id="createForm">
-      <label>CRAFTHOST access code
-        <input id="accessCode" type="password" autocomplete="off" required placeholder="Your Cloudflare access code">
-      </label>
-      <label>Server name
-        <input id="serverName" required maxlength="40" placeholder="My Minecraft Server">
-      </label>
-      <label>Subdomain
-        <input id="subdomain" required maxlength="50" pattern="[a-zA-Z0-9-]+" placeholder="my-server">
-      </label>
-      <label>Application ID or slug
-        <input id="application" required placeholder="Get the valid value from Falix applications">
-      </label>
-      <label>Server plan
-        <select id="plan"><option value="free">Free plan</option></select>
-      </label>
-      <label class="side" style="padding:0">
-        <span><input id="eula" type="checkbox" required style="width:auto"> I accept the Minecraft EULA, if applicable.</span>
-      </label>
-      <button class="btn" type="submit">Create Server</button>
-    </form>
-    <p id="message"></p>
-  </section>
-
-  <section class="card" id="settings">
-    <h2>Settings</h2>
-    <p>Your access code is kept in this page's memory only and is not saved in browser storage.</p>
-    <button class="btn outline" onclick="clearCode()">Clear access code</button>
-  </section>
-
-  <section class="card" id="docs">
-    <h2>Help & Documentation</h2>
-    <p>Hosting is provided by Falix. Free servers may need approval and may not stay online 24/7.</p>
-    <a href="https://client.falixnodes.net/profile/apidocs" target="_blank" rel="noopener">Falix API Documentation ↗</a>
-  </section>
+  <div id="message" role="status"></div>
+  <p class="muted">Free server availability and addresses depend on
+  the hosting provider. A .net address works only when it is supported
+  and correctly connected to your server.</p>
 </main>
-</div>
-<footer>CRAFTHOST · Community Minecraft Hosting</footer>
 
 <script>
-const WORKER = "https://crafthost.sangeetakumari56866.workers.dev";
-let servers = [];
+const API = "https://crafthost.sangeetakumari56866.workers.dev";
+const form = document.getElementById("createForm");
+const button = document.getElementById("createButton");
+const message = document.getElementById("message");
 
-function code() {
-  return document.getElementById("accessCode").value.trim();
-}
+form.addEventListener("submit", async event => {
+  event.preventDefault();
+  button.disabled = true;
+  message.textContent = "Creating your server request…";
 
-async function api(path, options = {}) {
-  const headers = {
-    "X-CRAFTHOST-ACCESS-CODE": code(),
-    ...(options.body ? {"Content-Type":"application/json"} : {}),
-    ...(options.headers || {})
-  };
-  const response = await fetch(WORKER + path, {...options, headers});
-  const text = await response.text();
-  let data;
-  try { data = JSON.parse(text); }
-  catch { throw new Error("Worker returned an unexpected response."); }
-  if (!response.ok) {
-    throw new Error(data?.error?.message || data?.message || "Request failed (" + response.status + ")");
-  }
-  return data;
-}
+  try {
+    const response = await fetch(API + "/api/servers", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CRAFTHOST-ACCESS-CODE":
+          document.getElementById("accessCode").value
+      },
+      body: JSON.stringify({
+        name: document.getElementById("serverName").value.trim(),
+        subdomain: document.getElementById("address").value.trim()
+      })
+    });
 
-function showLogin() {
-  document.getElementById("creator").scrollIntoView({behavior:"smooth"});
-  document.getElementById("accessCode").focus();
-}
-
-function clearCode() {
-  document.getElementById("accessCode").value = "";
-  document.getElementById("serverList").innerHTML = "";
-  document.getElementById("serverCount").textContent = "—";
-  document.getElementById("serverMessage").textContent = "Access code cleared.";
-}
-
-function getArray(data) {
-  if (Array.isArray(data)) return data;
-  if (Array.isArray(data?.data)) return data.data;
-  if (Array.isArray(data?.data?.data)) return data.data.data;
-  if (Array.isArray(data?.servers)) return data.servers;
-  return [];
-}
-
-function serverId(s) {
-  return s.id ?? s.identifier ?? s.server_id ?? "";
-}
-
-function safeText(value) {
-  return String(value ?? "—");
-}
-
-function renderServers(data) {
-  servers = getArray(data);
-  document.getElementById("serverCount").textContent = servers.length;
-  const root = document.getElementById("serverList");
-  root.replaceChildren();
-
-  if (!servers.length) {
-    document.getElementById("serverMessage").textContent =
-      "No servers returned. Create one or check your Falix account.";
-    return;
-  }
-
-  document.getElementById("serverMessage").textContent = "Servers loaded from Falix.";
-  for (const s of servers) {
-    const card = document.createElement("article");
-    card.className = "server";
-
-    const title = document.createElement("h3");
-    title.textContent = safeText(s.name || s.server_name || ("Server " + serverId(s)));
-    const info = document.createElement("p");
-    info.textContent = "ID: " + safeText(serverId(s)) + " · Status: " + safeText(s.status || s.state);
-    const address = document.createElement("p");
-    address.textContent = "Address: " + safeText(s.address || s.subdomain || s.ip);
-
-    const actions = document.createElement("div");
-    actions.className = "actions";
-
-    for (const signal of ["start", "stop", "restart"]) {
-      const button = document.createElement("button");
-      button.className = "btn " + (signal === "stop" ? "red" : "outline");
-      button.textContent = signal[0].toUpperCase() + signal.slice(1);
-      button.addEventListener("click", () => powerServer(serverId(s), signal, button));
-      actions.append(button);
+    const data = await response.json();
+    if (!response.ok) {
+      const error = data.error || data;
+      if (error.action_url) {
+        message.textContent = "Hosting approval required. Open the approval link: " +
+          error.action_url;
+      } else {
+        message.textContent = "Error: " +
+          (error.message || error.code || JSON.stringify(error));
+      }
+      return;
     }
 
-    card.append(title, info, address, actions);
-    root.append(card);
+    const jobId = data.data?.job_id || data.job_id;
+    if (jobId) {
+      message.textContent = "Request accepted! Checking server creation…";
+      for (let i = 0; i < 12; i++) {
+        await new Promise(resolve => setTimeout(resolve, 2500));
+        const statusResponse = await fetch(
+          API + "/api/create-jobs/" + encodeURIComponent(jobId),
+          { headers: {
+            "X-CRAFTHOST-ACCESS-CODE":
+              document.getElementById("accessCode").value
+          }}
+        );
+        const statusData = await statusResponse.json();
+        if (!statusResponse.ok) {
+          message.textContent = "Request accepted. Job status check failed: " +
+            JSON.stringify(statusData);
+          return;
+        }
+        const job = statusData.data || statusData;
+        if (job.state === "ready" || job.state === "completed") {
+          message.textContent = "Server created! Open your Falix dashboard to see its real connection address.";
+          return;
+        }
+        if (job.state === "failed") {
+          message.textContent = "Server creation failed: " +
+            JSON.stringify(job.errors || job.message || job);
+          return;
+        }
+      }
+      message.textContent = "Server request is still processing. Check Falix dashboard shortly.";
+    } else {
+      message.textContent = "Response received: " + JSON.stringify(data);
+    }
+  } catch (error) {
+    message.textContent = "Connection failed. Check the Cloudflare Worker and its logs.";
+  } finally {
+    button.disabled = false;
   }
-}
-
-async function loadServers() {
-  const msg = document.getElementById("serverMessage");
-  if (!code()) { msg.textContent = "Enter your CRAFTHOST access code first."; return; }
-  msg.textContent = "Loading servers…";
-  try {
-    renderServers(await api("/api/servers"));
-  } catch (e) {
-    msg.textContent = e.message;
-  }
-}
-
-async function powerServer(id, signal, button) {
-  if (!id) { alert("Falix did not return a usable server ID."); return; }
-  if (signal === "stop" && !confirm("Stop this server?")) return;
-  button.disabled = true;
-  try {
-    const result = await api("/api/servers/" + encodeURIComponent(id) + "/power", {
-      method:"POST", body:JSON.stringify({signal})
-    });
-    alert(result?.message || "Falix accepted the request. Refresh server status shortly.");
-    await loadServers();
-  } catch (e) {
-    alert(e.message);
-  } finally { button.disabled = false; }
-}
-
-document.getElementById("createForm").addEventListener("submit", async e => {
-  e.preventDefault();
-  const msg = document.getElementById("message");
-  if (!code()) { msg.textContent = "Enter your access code first."; return; }
-  if (!document.getElementById("eula").checked) {
-    msg.textContent = "Please accept the EULA if it applies to your server.";
-    return;
-  }
-
-  const button = e.submitter;
-  button.disabled = true;
-  msg.textContent = "Sending request to Falix…";
-
-  const body = {
-    name: document.getElementById("serverName").value.trim(),
-    subdomain: document.getElementById("subdomain").value.trim(),
-    application: document.getElementById("application").value.trim(),
-    plan: {type:"free"},
-    eula_accepted: true
-  };
-
-  try {
-    const result = await api("/api/servers", {
-      method:"POST", body:JSON.stringify(body)
-    });
-    msg.textContent = JSON.stringify(result, null, 2);
-    await loadServers();
-  } catch (e) {
-    msg.textContent = e.message +
-      "\nIf Falix requests approval, follow its official approval link and then retry.";
-  } finally { button.disabled = false; }
 });
 </script>
 </body>
-      </html>
-      
+</html>
