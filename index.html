@@ -2,109 +2,130 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>CRAFTHOST</title>
-<style>
-*{box-sizing:border-box}
-body{margin:0;min-height:100vh;display:grid;place-items:center;padding:20px;background:#090b12;color:#fff;font-family:Arial,sans-serif}
-.card{width:100%;max-width:420px;padding:25px;background:#151925;border:1px solid #30394d;border-radius:18px}
-h1{text-align:center;color:#a78bfa}
-p{text-align:center;color:#aeb7ca}
-label{display:block;margin:18px 0 8px}
-input{width:100%;min-width:0;padding:14px;border:1px solid #414b60;border-radius:9px;background:#090d17;color:white;font-size:16px}
-.address{display:flex;align-items:center;gap:8px}
-.address span{color:#a78bfa;font-weight:bold}
-button{width:100%;margin-top:22px;padding:14px;border:0;border-radius:9px;background:#8b5cf6;color:white;font-size:16px;font-weight:bold}
-button:disabled{opacity:.6}
-#status{white-space:pre-wrap;overflow-wrap:anywhere;font-size:14px}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CRAFTHOST | Minecraft Hosting</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: #090914;
+      color: #f4f4ff;
+      font-family: Arial, sans-serif;
+      display: grid;
+      place-items: center;
+      padding: 20px;
+    }
+    main {
+      width: 100%;
+      max-width: 480px;
+      padding: 28px;
+      background: #141426;
+      border: 1px solid #34345b;
+      border-radius: 20px;
+      box-shadow: 0 0 35px #5d35ff22;
+    }
+    h1 { color: #9d8aff; margin-top: 0; }
+    p { color: #b8b8d2; }
+    label { display: block; margin: 18px 0 8px; }
+    input {
+      width: 100%;
+      padding: 13px;
+      background: #090914;
+      border: 1px solid #45456b;
+      border-radius: 9px;
+      color: white;
+      font-size: 16px;
+    }
+    button {
+      width: 100%;
+      margin-top: 22px;
+      padding: 14px;
+      border: 0;
+      border-radius: 9px;
+      background: #7961ff;
+      color: white;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    button:disabled { opacity: .6; }
+    pre {
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+      color: #d9d5ff;
+      font-size: 13px;
+    }
+  </style>
 </head>
 <body>
-<main class="card">
-<h1>CRAFTHOST</h1>
-<p>Create your Minecraft server</p>
+  <main>
+    <h1>⚡ CRAFTHOST</h1>
+    <p>Create your Minecraft server</p>
 
-<label for="serverName">Server Name</label>
-<input id="serverName" value="BURGER SMP" maxlength="20">
+    <form id="serverForm">
+      <label for="name">Server Name</label>
+      <input id="name" value="BURGER SMP"
+             minlength="3" maxlength="20" required>
 
-<label for="address">Server Address</label>
-<div class="address">
-<input id="address" value="burgersmp" maxlength="20">
-<span>.net</span>
-</div>
+      <label for="subdomain">Server Address</label>
+      <input id="subdomain" value="burgersmp"
+             minlength="1" maxlength="20"
+             pattern="[a-z0-9]+(-[a-z0-9]+)*" required>
 
-<button id="create">Create Server</button>
-<p id="status" role="status"></p>
-</main>
+      <button id="createButton" type="submit">Create Server</button>
+    </form>
 
-<script>
-const API = "https://crafthost.sangeetakumari56866.workers.dev";
-const button = document.getElementById("create");
-const statusBox = document.getElementById("status");
+    <pre id="result" aria-live="polite"></pre>
+  </main>
 
-button.addEventListener("click", async () => {
-  const name = document.getElementById("serverName").value.trim();
-  const subdomain = document.getElementById("address").value.trim().toLowerCase();
+  <script>
+    const API =
+      "https://crafthost.sangeetakumari56866.workers.dev";
 
-  if (name.length < 3 || name.length > 20 ||
-      !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(subdomain) ||
-      subdomain.length > 20) {
-    statusBox.textContent = "Check your server name and address.";
-    return;
-  }
+    const form = document.getElementById("serverForm");
+    const button = document.getElementById("createButton");
+    const result = document.getElementById("result");
 
-  let code = sessionStorage.getItem("crafthost_code");
-  if (!code) {
-    code = prompt("Enter your CRAFTHOST access code:");
-    if (!code) return;
-    sessionStorage.setItem("crafthost_code", code.trim());
-    code = code.trim();
-  }
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
 
-  button.disabled = true;
-  button.textContent = "Creating...";
-  statusBox.textContent = "Connecting to Falix...";
+      const accessCode = prompt("Enter your CRAFTHOST access code");
+      if (!accessCode) return;
 
-  try {
-    const response = await fetch(API + "/api/servers", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "X-CRAFTHOST-ACCESS-CODE": code
-      },
-      body: JSON.stringify({ name, subdomain })
-    });
+      button.disabled = true;
+      result.textContent = "Checking connection...";
 
-    const raw = await response.text();
-    let data;
+      try {
+        const response = await fetch(API + "/api/servers", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "X-CRAFTHOST-ACCESS-CODE": accessCode
+          },
+          body: JSON.stringify({
+            name: document.getElementById("name").value.trim(),
+            subdomain: document.getElementById("subdomain").value.trim()
+          })
+        });
 
-    try {
-      data = JSON.parse(raw);
-    } catch {
-      data = { message: raw || "Server returned an unreadable response." };
-    }
+        const data = await response.json().catch(() => ({
+          error: "Server returned an unreadable response."
+        }));
 
-    if (!response.ok) {
-      if (response.status === 401 || response.status === 403) {
-        sessionStorage.removeItem("crafthost_code");
+        result.textContent =
+          "HTTP " + response.status + "\n" +
+          JSON.stringify(data, null, 2);
+      } catch (error) {
+        result.textContent =
+          "Connection error: " + error.message;
+      } finally {
+        button.disabled = false;
       }
-      statusBox.textContent =
-        "Error (" + response.status + "):\n" +
-        JSON.stringify(data, null, 2);
-      return;
-    }
-
-    statusBox.textContent =
-      "Host response:\n" + JSON.stringify(data, null, 2);
-  } catch (error) {
-    statusBox.textContent =
-      "Connection failed: " + (error.message || String(error));
-  } finally {
-    button.disabled = false;
-    button.textContent = "Create Server";
-  }
-});
-</script>
+    });
+  </script>
 </body>
 </html>
+
+
