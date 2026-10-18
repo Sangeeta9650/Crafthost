@@ -1,142 +1,95 @@
 
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
+<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>CRAFTHOST</title>
 <style>
 *{box-sizing:border-box}
-body{margin:0;min-height:100vh;background:#090a12;color:#f7f7ff;
-font-family:Arial,sans-serif;display:grid;place-items:center;padding:20px}
-main{width:100%;max-width:430px;background:#121421;border:1px solid #292d43;
-border-radius:22px;padding:25px;box-shadow:0 20px 70px #0008}
-.brand{font-size:25px;font-weight:800;letter-spacing:1px}
-.brand span{color:#9b7bff}
-.sub{color:#9da3b8;margin:8px 0 28px;font-size:14px}
-h2{font-size:21px;margin:0 0 22px}
-label{display:block;color:#c7cbe0;font-size:13px;margin:16px 0 8px}
-input{width:100%;background:#090b14;color:white;border:1px solid #343951;
-border-radius:11px;padding:14px;font-size:16px;outline:none}
-input:focus{border-color:#9b7bff}
-.address{display:flex;align-items:center;background:#090b14;
-border:1px solid #343951;border-radius:11px;padding-right:13px}
+body{margin:0;background:#070914;color:#f7f7ff;font-family:Arial,sans-serif;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+.card{width:100%;max-width:430px;background:#111426;border:1px solid #292e4a;border-radius:22px;padding:25px}
+.logo{font-size:27px;font-weight:800;margin-bottom:10px}
+.logo span{color:#a783ff}
+.tagline{color:#a7adc5;font-size:14px;margin-bottom:35px}
+h2{font-size:24px;margin-bottom:25px}
+label{display:block;margin:18px 0 9px;color:#c8cce0;font-size:14px}
+input{width:100%;padding:15px;border-radius:11px;border:1px solid #363d5d;background:#080b18;color:white;font-size:16px}
+.address{display:flex;align-items:center;border:1px solid #363d5d;background:#080b18;border-radius:11px;padding-right:14px}
 .address input{border:0;min-width:0}
-.address b{color:#b6a3ff;white-space:nowrap}
-button{width:100%;margin-top:23px;border:0;border-radius:11px;
-padding:15px;background:linear-gradient(100deg,#7357f5,#a34dff);
-color:white;font-size:16px;font-weight:700}
-button:disabled{opacity:.55}
-#message{font-size:14px;line-height:1.5;overflow-wrap:anywhere;margin-top:17px}
-.muted{color:#939ab0;font-size:12px;line-height:1.5;margin-top:22px}
+.address span{color:#b8a1ff;font-weight:bold}
+button{width:100%;padding:16px;margin-top:25px;border:0;border-radius:12px;background:linear-gradient(100deg,#773cff,#167dff);color:white;font-size:17px;font-weight:bold}
+button:disabled{opacity:.6}
+#message{margin-top:18px;line-height:1.5;overflow-wrap:anywhere;font-size:14px}
+.note{color:#9098b4;font-size:12px;line-height:1.5;margin-top:25px}
 </style>
 </head>
 <body>
-<main>
-  <div class="brand">◇ CRAFT<span>HOST</span></div>
-  <p class="sub">Your server. Your world.</p>
-  <h2>Create your Minecraft server</h2>
+<div class="card">
+  <div class="logo">◇ CRAFT<span>HOST</span></div>
+  <div class="tagline">Your server. Your world.</div>
+  <h2>Create Your Server</h2>
 
-  <form id="createForm">
-    <label for="serverName">Server name</label>
-    <input id="serverName" value="BURGER SMP" minlength="3"
-      maxlength="20" required>
+  <form id="form">
+    <label for="name">Server Name</label>
+    <input id="name" value="BURGER SMP" required minlength="3" maxlength="20">
 
-    <label for="address">Server address</label>
+    <label for="subdomain">Server Address</label>
     <div class="address">
-      <input id="address" value="burgersmp" maxlength="20"
-        pattern="[a-z0-9]+(-[a-z0-9]+)*" required>
-      <b>.net</b>
+      <input id="subdomain" value="burgersmp" required
+       pattern="[a-z0-9]+(-[a-z0-9]+)*" maxlength="30">
+      <span>.net</span>
     </div>
 
-    <label for="accessCode">Your CRAFTHOST access code</label>
-    <input id="accessCode" type="password" autocomplete="off"
-      placeholder="Enter your access code" required>
-
-    <button id="createButton" type="submit">Create Server</button>
+    <button id="create" type="submit">＋ Create Server</button>
   </form>
 
   <div id="message" role="status"></div>
-  <p class="muted">Free server availability and addresses depend on
-  the hosting provider. A .net address works only when it is supported
-  and correctly connected to your server.</p>
-</main>
+  <div class="note">Your server, your world. Server address availability depends on domain ownership and hosting support.</div>
+</div>
 
 <script>
-const API = "https://crafthost.sangeetakumari56866.workers.dev";
-const form = document.getElementById("createForm");
-const button = document.getElementById("createButton");
-const message = document.getElementById("message");
+const API="https://crafthost.sangeetakumari56866.workers.dev";
+const form=document.getElementById("form");
+const button=document.getElementById("create");
+const message=document.getElementById("message");
 
-form.addEventListener("submit", async event => {
-  event.preventDefault();
-  button.disabled = true;
-  message.textContent = "Creating your server request…";
+form.addEventListener("submit",async e=>{
+  e.preventDefault();
 
-  try {
-    const response = await fetch(API + "/api/servers", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "X-CRAFTHOST-ACCESS-CODE":
-          document.getElementById("accessCode").value
+  // Access code is requested privately when needed; never hardcode it.
+  const accessCode=prompt("Enter your CRAFTHOST access code:");
+  if(!accessCode)return;
+
+  button.disabled=true;
+  message.textContent="Connecting to CRAFTHOST…";
+
+  try{
+    const response=await fetch(API+"/api/servers",{
+      method:"POST",
+      headers:{
+        "Content-Type":"application/json",
+        "X-CRAFTHOST-ACCESS-CODE":accessCode
       },
-      body: JSON.stringify({
-        name: document.getElementById("serverName").value.trim(),
-        subdomain: document.getElementById("address").value.trim()
+      body:JSON.stringify({
+        name:document.getElementById("name").value.trim(),
+        subdomain:document.getElementById("subdomain").value.trim()
       })
     });
 
-    const data = await response.json();
-    if (!response.ok) {
-      const error = data.error || data;
-      if (error.action_url) {
-        message.textContent = "Hosting approval required. Open the approval link: " +
-          error.action_url;
-      } else {
-        message.textContent = "Error: " +
-          (error.message || error.code || JSON.stringify(error));
-      }
+    const data=await response.json();
+    if(!response.ok){
+      const err=data.error||data;
+      message.textContent="Unable to create server: "+
+        (err.message||err.code||JSON.stringify(err));
       return;
     }
 
-    const jobId = data.data?.job_id || data.job_id;
-    if (jobId) {
-      message.textContent = "Request accepted! Checking server creation…";
-      for (let i = 0; i < 12; i++) {
-        await new Promise(resolve => setTimeout(resolve, 2500));
-        const statusResponse = await fetch(
-          API + "/api/create-jobs/" + encodeURIComponent(jobId),
-          { headers: {
-            "X-CRAFTHOST-ACCESS-CODE":
-              document.getElementById("accessCode").value
-          }}
-        );
-        const statusData = await statusResponse.json();
-        if (!statusResponse.ok) {
-          message.textContent = "Request accepted. Job status check failed: " +
-            JSON.stringify(statusData);
-          return;
-        }
-        const job = statusData.data || statusData;
-        if (job.state === "ready" || job.state === "completed") {
-          message.textContent = "Server created! Open your Falix dashboard to see its real connection address.";
-          return;
-        }
-        if (job.state === "failed") {
-          message.textContent = "Server creation failed: " +
-            JSON.stringify(job.errors || job.message || job);
-          return;
-        }
-      }
-      message.textContent = "Server request is still processing. Check Falix dashboard shortly.";
-    } else {
-      message.textContent = "Response received: " + JSON.stringify(data);
-    }
-  } catch (error) {
-    message.textContent = "Connection failed. Check the Cloudflare Worker and its logs.";
-  } finally {
-    button.disabled = false;
+    message.textContent="Request sent to hosting provider: "+JSON.stringify(data);
+  }catch(err){
+    message.textContent="Connection failed. Cloudflare Worker ko check karo.";
+  }finally{
+    button.disabled=false;
   }
 });
 </script>
